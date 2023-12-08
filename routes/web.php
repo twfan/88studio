@@ -1,8 +1,12 @@
 <?php
 
+use App\Http\Controllers\CartControllers;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\Member\TransactionController as MemberTransactionController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TransactionController;
+use App\Models\Cart;
 use App\Models\Product;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
@@ -39,7 +43,7 @@ Route::get('/', function () {
             'user' => null
         ]);
     }
-});
+})->name('homepage');
 
 Route::prefix('member')->group(function () {
     Route::get('/', function () {
@@ -56,7 +60,17 @@ Route::prefix('member')->group(function () {
             Route::get('/dashboard', function () {
                 return Inertia::render('Members/Dashboard');
             })->name('member.dashboard');
+
+            Route::post('/cart', [CartControllers::class, 'store'])->name('cart.store');
+            Route::get('/cart', [CartControllers::class, 'index'])->name('cart.index');
+
+            Route::post('/checkout', [CartControllers::class, 'checkout'])->name('cart.checkout');
+
+            Route::get('/transactions', [MemberTransactionController::class, 'index'])->name('member.transactions');
+
+            Route::get('/invoice', [MemberTransactionController::class, 'invoice'])->name('member.invoice');
         });
+
     });
 
 });
@@ -64,11 +78,21 @@ Route::prefix('member')->group(function () {
 Route::group(['middleware' => 'role:user'], function(){
     Route::middleware('member.auth')->group(function () {
         Route::get('/ych-comission', function () {
+
+            $cart = Cart::where('user_id', Auth::user()->id);
+            $cartContent = $cart->get();
+            $productAdded = $cartContent->pluck('product_id')->toArray();
+            $cartCount = $cart->count();
+            $cartTotal = $cart->sum('price');
             $user = Auth::user();
             $product = Product::where('category_id', 5)->with('category')->get();
+            
             return Inertia::render('Ych-comission',[
                 'user' => $user,
-                'products' => $product
+                'products' => $product,
+                'cart' => $cartCount,
+                'productAdded' => $productAdded,
+                'cartTotal' => $cartTotal
             ]);
         })->name('ych-comission');
     });
@@ -101,6 +125,8 @@ Route::group(['middleware' => 'role:super_admin,admin'], function(){
         Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
         Route::get('/categories/{category}/edit', [CategoryController::class, 'edit'])->name('categories.edit');
         Route::put('/categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
+
+        Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions');
     });
 
 });

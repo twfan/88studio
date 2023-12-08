@@ -4,6 +4,7 @@ import { Head, Link, usePage } from '@inertiajs/vue3';
 import 'vue3-carousel/dist/carousel.css';
 import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
+import WelcomeBanner from '@/Components/WelcomeBanner.vue';
 
 const stringArrayImage = ref(['ych-static-01.png', 'ych-static-02.png', 'ych-static-03.png', 'ych-static-04.png', 'ych-static-05.png', 'ych-static-06.png', 'ych-static-07.png', 'ych-static-08.png', 'ych-static-09.png', 'ych-static-10.png']);
 const stringArrayImageAnimated = ref(['animated-emote-01.png', 'animated-emote-02.png', 'animated-emote-03.png', 'animated-emote-04.png', 'animated-emote-05.png', 'animated-emote-06.png', 'animated-emote-07.png', 'animated-emote-08.png', 'animated-emote-09.png', 'animated-emote-10.png']);
@@ -59,7 +60,23 @@ defineProps({
         required: true,
     },
 });
+
+
 </script>
+
+<!--Start of Tawk.to Script-->
+<script type="text/javascript">
+        var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+        (function(){
+        var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+        s1.async=true;
+        s1.src='https://embed.tawk.to/654b4815f2439e1631ed02fe/1hen135fj';
+        s1.charset='UTF-8';
+        s1.setAttribute('crossorigin','*');
+        s0.parentNode.insertBefore(s1,s0);
+        })();
+</script>
+<!--End of Tawk.to Script-->
 
 <template>
     <Head>
@@ -79,62 +96,7 @@ defineProps({
                     </div> 
                 </a>
             </div>
-            <div class="flex flex-col relative items-center justify-center">
-                <div class="flex w-3/4 items-center absolute z-10 top-5 bg-white rounded-full px-7">
-                    <div class="w-96">
-                        <ApplicationLogo class="block h-16 w-full" />
-                    </div>
-                    <div class="flex justify-between w-full">
-                        <div class="flex divide-x-2">
-                            <a href="#">
-                                <div class="mx-4 text-center justify-center flex items-center uppercase">
-                                    <span>YCH Comission</span>
-                                </div>
-                            </a>
-                            <a href="#">
-                                <div class="mx-4 text-center justify-center flex items-center uppercase">
-                                    <span>Shop</span>
-                                </div>
-                            </a>
-                            <a href="#">
-                                <div class="mx-4 text-center justify-center flex items-center uppercase">
-                                    <span>Ready to Adopt</span>
-                                </div>
-                            </a>
-                            <a href="#">
-                                <div class="mx-4 text-center justify-center flex items-center uppercase">
-                                    <span>About us</span>
-                                </div>
-                            </a>
-                        </div>
-                        <Link v-if="user" :href="route('member.register')">
-                            <div class="bg-red flex flex-row gap-1 z-50 mx-4 text-center justify-center items-center uppercase">
-                                <i data-feather="user"></i><span>{{user.name}}</span>
-                            </div>
-                        </Link>
-                        <Link v-if="!user" :href="route('member.login')">
-                            <div class="bg-red z-50 mx-4 text-center justify-center flex flex-row gap-1 items-center uppercase">
-                                <i data-feather="user"></i><span>Login</span>
-                            </div>
-                        </Link>
-                    </div>
-                    
-                </div>
-                <div class="w-full h-[47rem] bg-welcome bg-no-repeat bg-center bg-cover flex flex-col justify-center content-center">
-                    <div class="flex flex-col absolute w-[30rem] top-72 left-72">
-                        <div class="flex flex-col text-left">
-                            <h1 class="text-6xl uppercase text-white mb-2">Grow With Fun {{slide}}</h1>
-                            <p class="mb-5">Officia eu dolor proident voluptate anim pariatur proident culpa occaecat ea. Voluptate officia tempor irure esse anim et quis veniam exercitation nulla dolor et duis duis.</p>
-                            <a href="#">
-                                <span class="text-white rounded-full px-3 py-2 bg-black uppercase opacity-60">See more ych Comission</span>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <div class="absolute z-20 top-0 right-0 w-[60rem] pointer-events-none">
-                    <img class="" src="asset-02.png" />
-                </div>
-            </div>
+            <WelcomeBanner :user="user"/>
             <div class="mt-24 flex flex-col justify-center w-3/4 container mx-auto relative">
                 <carousel ref="carouselDiscount" :items-to-show="1" :wrap-around="true">
                   <slide v-for="slide in 10" :key="slide">

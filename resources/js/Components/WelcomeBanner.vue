@@ -10,15 +10,17 @@ defineProps({
     <div class="flex flex-col relative items-center justify-center">
         <div class="flex w-3/4 items-center absolute z-10 top-5 bg-white rounded-full px-7">
             <div class="w-96">
-                <ApplicationLogo class="block h-16 w-full" />
+                <Link :href="route('homepage')">
+                     <ApplicationLogo class="block h-16 w-full" />
+                </Link>
             </div>
             <div class="flex justify-between w-full">
                 <div class="flex divide-x-2">
-                    <a href="#">
+                    <Link :href="route('ych-comission')">
                         <div class="mx-4 text-center justify-center flex items-center uppercase">
                             <span>YCH Comission</span>
                         </div>
-                    </a>
+                    </Link>
                     <a href="#">
                         <div class="mx-4 text-center justify-center flex items-center uppercase">
                             <span>Shop</span>

@@ -41,8 +41,8 @@ onMounted(loadFeatherIcons);
                     <div class="flex justify-between h-16">
                         <div class="flex">
                             <!-- Logo -->
-                            <div class="shrink-0 flex items-center">
-                                <Link :href="route('dashboard')">
+                            <div class="shrink-0 flex items-center grow-0">
+                                <Link :href="route('dashboard')" class="w-full h-full">
                                     <ApplicationLogo
                                         class="block h-9 w-auto fill-current text-gray-800"
                                     />
@@ -59,6 +59,9 @@ onMounted(loadFeatherIcons);
                                 </NavLink>
                                 <NavLink :href="route('categories')" :active="route().current('categories') || route().current('categories.create') || route().current('categories.edit')">
                                     Category
+                                </NavLink>
+                                <NavLink :href="route('transactions')" :active="route().current('transactions') || route().current('transactions.create') || route().current('transactions.edit')">
+                                    Transactions
                                 </NavLink>
                             </div>
                         </div>
