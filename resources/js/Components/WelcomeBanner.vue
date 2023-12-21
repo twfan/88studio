@@ -1,10 +1,20 @@
 <script setup>
 import ApplicationLogo from '@/Components/ApplicationLogo.vue'
-import { Link} from '@inertiajs/vue3';
+    import DropdownMenu from '@/components/DropdownMenu.vue';   
+    import { Link} from '@inertiajs/vue3';
+    import { ref } from 'vue';
 
 defineProps({
     user: Object
 })
+
+const isUserDropdownOpen = ref(false);
+
+    const toggleUserDropdown = () => {
+        // You can perform additional logic here if needed
+        // For example, close other open dropdowns before opening this one
+        isUserDropdownOpen.value = !isUserDropdownOpen.value;
+    };
 </script>
 <template>
     <div class="flex flex-col relative items-center justify-center">
@@ -37,11 +47,12 @@ defineProps({
                         </div>
                     </a>
                 </div>
-                <Link v-if="user" :href="route('member.register')">
+                <div @click="toggleUserDropdown" v-if="user" class="cursor-pointer">
                     <div class="bg-red flex flex-row gap-1 z-50 mx-4 text-center justify-center items-center uppercase">
                         <i data-feather="user"></i><span>{{user.name}}</span>
                     </div>
-                </Link>
+                    <DropdownMenu :isOpen="isUserDropdownOpen" @update:isOpen="isUserDropdownOpen = $event" @logout="handleLogout" />
+                </div>
                 <Link v-if="!user" :href="route('member.login')">
                     <div class="bg-red z-50 mx-4 text-center justify-center flex flex-row gap-1 items-center uppercase">
                         <i data-feather="user"></i><span>Login</span>

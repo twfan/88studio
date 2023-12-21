@@ -51,7 +51,8 @@ const destroy = (id) => {
                     <thead>
                       <tr>
                         <th class="rounded-s-md bg-slate-100 text-slate-500 text-left p-3">Transaction Id</th>
-                        <th class="bg-slate-100 text-slate-500 text-left p-3">User Name</th>
+                        <th class="bg-slate-100 text-slate-500 text-left p-3">Sub Total</th>
+                        <th class="bg-slate-100 text-slate-500 text-left p-3">Discount</th>
                         <th class="bg-slate-100 text-slate-500 text-left p-3">Grand Total</th>
                         <th class="bg-slate-100 text-slate-500 text-left p-3">Status</th>
                         <th class="rounded-e-md bg-slate-100 text-slate-500 text-left p-3">Action</th>
@@ -62,17 +63,15 @@ const destroy = (id) => {
                         <td class="px-3 py-5 border-b-8 border-white">
                           #{{transaction.id}}
                         </td>
-                        <td class="px-3 py-5 border-b-8 border-white">{{transaction.user.name}}</td>
+                        <td class="px-3 py-5 border-b-8 border-white">{{transaction.sub_total}}</td>
+                        <td class="px-3 py-5 border-b-8 border-white">{{transaction.discount}}</td>
                         <td class="px-3 py-5 border-b-8 border-white">{{transaction.grand_total}}</td>
                         <td class="px-3 py-5 border-b-8 border-white">{{transaction.status}}</td>
                         <td class="px-3 py-5 border-b-8 border-white">
-                          <div class="flex flex-row gap-2">
-                            <Link :href="route('products.edit', product.id)">
-                              <i class="w-4 h-4" data-feather="edit-2"></i>
-                            </Link>
-                            <button @click="destroy(product.id)">
-                              <i class="w-4 h-4" data-feather="trash"></i>
-                            </button>
+                          <div class="flex">
+                            <!-- <Link :href="route('transactions.show', transaction.id)"> -->
+                              <button class="btn btn-primary btn-sm">View</button>
+                            <!-- </Link> -->
                           </div>
                         </td>
                       </tr>

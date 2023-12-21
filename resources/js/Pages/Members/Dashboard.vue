@@ -1,103 +1,67 @@
 <script setup>
-import Checkbox from '@/Components/Checkbox.vue';
-import GuestLayout from '@/Layouts/GuestLayout.vue';
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
 import { ref, onMounted } from 'vue';
 import { Head, Link, usePage, useForm } from '@inertiajs/vue3';
 import 'vue3-carousel/dist/carousel.css';
 import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
+import WelcomeBanner from '@/Components/WelcomeBanner.vue';
+import CartIcon from '@/Components/CartIcon.vue';
+import Menu from '@/Components/Menu.vue'
+import MemberLayout from '@/Layouts/MemberLayout.vue';
 
 
+const props = defineProps(['user', 'cart', 'cartTotal']);
 
-const form = useForm({
-    email: '',
-    password: '',
-    remember: false,
-});
+const form = useForm({});
 
-const submit = () => {
-    form.post(route('login'), {
-        onFinish: () => form.reset('password'),
+const destroy = (id) => {
+    console.log("tes", id)
+    form.delete(route('cart.destroy', id), {
+        onFinish: () => console.log("cart item deleted"),
+    })
+}
+
+const checkout = () => {
+    console.log("tes")
+    form.post(route('cart.checkout'), {
+        onFinish: () => console.log("tessssssssadsadsadadasdasdasdasdasd"),
     });
 };
 
-
-const loadFeatherIcons = () => {
-    // Load JavaScript from CDN
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js';
-    script.onload = () => {
-        // Call feather.replace() when the script is loaded
-        feather.replace();
-    };
-    document.body.appendChild(script);
-
-    // Clean up the script tag when the component is unmounted
-    return () => {
-        document.body.removeChild(script);
-    };
-};
-
-onMounted(loadFeatherIcons);
-
-defineProps({
-    canLogin: {
-        type: Boolean,
-    },
-    canRegister: {
-        type: Boolean,
-    },
-    laravelVersion: {
-        type: String,
-        required: true,
-    },
-    phpVersion: {
-        type: String,
-        required: true, 
-    },
-});
 </script>
 
 <template>
-    <Head>
-        <title>EightyEight</title>
-        <link rel="icon" type="image/x-icon" href="icon-01.png">
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Lilita+One&display=swap" rel="stylesheet">
-    </Head>
-    <body>
-        <div class="bg-88-orange w-screen h-screen bg-welcome bg-no-repeat bg-center bg-cover">
-            <div class="flex flex-col h-full justify-center content-center items-center">
-                <div class="w-96 ">
-                    <ApplicationLogo />
+    <MemberLayout :user="user">
+        <div class="mx-auto mt-10 flex flex-row w-3/4  bg-white rounded">
+            <div class="flex flex-col w-full h-full justify-center content-center items-center">
+                <div class="w-full border-b-2 p-7">
+                    <span>Dashboard</span>
                 </div>
-                <Head title="Log in" />
+                <div class="grid grid-cols-4 w-full">
+                    <div class="col-span-1 flex flex-col text-start">
+                        <div class="p-7">
+                            <span>Profile</span>
+                        </div>
+                        <div class="p-7">
+                            <span>Transactions</span>
+                        </div>
+
+                        <div class="p-7">
+                            <Link :href="route('logout')" method="post" as="button">
+                                Log Out
+                            </Link>
+                        </div>
+                    </div>
+                    <div class="col-span-3 p-7 flex flex-col  border-l-2">
+                        <span>Contents</span>
+                    </div>
+                </div>
+                <hr />
                 <div v-if="status" class="mb-4 font-medium text-sm text-green-600">
                     {{ status }}
                 </div>
-                <Link :href="route('logout')" method="post" as="button">
-                    Log Out
-                </Link>
                
             </div>
-            
-
         </div>
-    </body>
+    </MemberLayout>
 </template>
-
-<style>
-.bg-dots-darker {
-    background-image: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1.22676 0C1.91374 0 2.45351 0.539773 2.45351 1.22676C2.45351 1.91374 1.91374 2.45351 1.22676 2.45351C0.539773 2.45351 0 1.91374 0 1.22676C0 0.539773 0.539773 0 1.22676 0Z' fill='rgba(0,0,0,0.07)'/%3E%3C/svg%3E");
-}
-@media (prefers-color-scheme: dark) {
-    .dark\:bg-dots-lighter {
-        background-image: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1.22676 0C1.91374 0 2.45351 0.539773 2.45351 1.22676C2.45351 1.91374 1.91374 2.45351 1.22676 2.45351C0.539773 2.45351 0 1.91374 0 1.22676C0 0.539773 0.539773 0 1.22676 0Z' fill='rgba(255,255,255,0.07)'/%3E%3C/svg%3E");
-    }
-}
-</style>

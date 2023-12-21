@@ -43,7 +43,12 @@ class TransactionController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $transaction = Transaction::where('id', $id)->with(['transactionDetails', 'transactionDetails.product', 'transactionDetails.product.category'])->first();
+        $transactionDetails = $transaction['transactionDetails'];
+        return Inertia::render('Transactions/Show',[
+            'transaction' => $transaction,
+            'orders' => $transactionDetails
+        ]);
     }
 
     /**

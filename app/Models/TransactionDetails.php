@@ -14,4 +14,9 @@ class TransactionDetails extends Model
         'product_id',
         'price'
     ];
+
+    public function product() 
+    {
+        return $this->hasOne(Product::class, 'id', 'product_id');
+    }
 }

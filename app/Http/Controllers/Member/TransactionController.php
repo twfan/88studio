@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Member;
 
 use App\Http\Controllers\Controller;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use LaravelDaily\Invoices\Invoice;
 use LaravelDaily\Invoices\Classes\Party;
@@ -16,7 +19,12 @@ class TransactionController extends Controller
      */
     public function index()
     {
-        return Inertia::render('Members/Transaction');
+        $user = Auth::user();
+        $transactions = Transaction::where('user_id', $user->id)->orderBy('id','desc')->paginate(10);
+        return Inertia::render('Members/Transaction',[
+            'user' => $user,
+            'transactions' => $transactions
+        ]);
     }
 
     /**
@@ -67,56 +75,61 @@ class TransactionController extends Controller
         //
     }
 
-    public function invoice() 
+    public function paymentConfirmation(String $id)
     {
+        $transaction = Transaction::find($id);
+        $user =Auth::user();
+        return Inertia::render('Members/PaymentConfirmation',[
+            'user' => $user,
+            'transaction' => $transaction
+        ]);
+
+    }
+    
+    public function requestConfirmation(Request $request, String $id) 
+    {
+        $transaction = Transaction::find($id);
+        $pathImage = Storage::put('public/transactions/payment-confirmation/'. $transaction->id, $request->file('image'), 'public');
+        $imageUrl = asset(Storage::url($pathImage));
+        $transaction->payment_url = $imageUrl;
+        $transaction->status = 'payment_confirmation';
+        $transaction->save();
+        
+        return Inertia::location(route('member.transactions'));
+    }
+
+    public function invoice(String $id) 
+    {
+        $transaction = Transaction::where('id', $id)->with(['transactionDetails', 'transactionDetails.product', 'transactionDetails.product.category'])->first();
+        $user = Auth::user();
         $client = new Party([
-            'name'          => 'Roosevelt Lloyd',
+            'name'          => '88 Design Studio',
             'phone'         => '(520) 318-9486',
-            'custom_fields' => [
-                'note'        => 'IDDQD',
-                'business id' => '365#GG',
-            ],
         ]);
         
         $customer = new Party([
-            'name'          => 'Ashley Medina',
-            'address'       => 'The Green Street 12',
-            'code'          => '#22663214',
+            'name'          => $user->name,
             'custom_fields' => [
-                'order number' => '> 654321 <',
+                'Email'          => $user->email,
+                'Transaction id' => '#' . $transaction->id,
             ],
         ]);
-        
-        $items = [
-            InvoiceItem::make('Service 1')
-                ->description('Your product or service description')
-                ->pricePerUnit(47.79)
-                ->quantity(2)
-                ->discount(10),
-            InvoiceItem::make('Service 2')->pricePerUnit(71.96)->quantity(2),
-            InvoiceItem::make('Service 3')->pricePerUnit(4.56),
-            InvoiceItem::make('Service 4')->pricePerUnit(87.51)->quantity(7)->discount(4)->units('kg'),
-            InvoiceItem::make('Service 5')->pricePerUnit(71.09)->quantity(7)->discountByPercent(9),
-            InvoiceItem::make('Service 6')->pricePerUnit(76.32)->quantity(9),
-            InvoiceItem::make('Service 7')->pricePerUnit(58.18)->quantity(3)->discount(3),
-            InvoiceItem::make('Service 8')->pricePerUnit(42.99)->quantity(4)->discountByPercent(3),
-            InvoiceItem::make('Service 9')->pricePerUnit(33.24)->quantity(6)->units('m2'),
-            InvoiceItem::make('Service 11')->pricePerUnit(97.45)->quantity(2),
-            InvoiceItem::make('Service 12')->pricePerUnit(92.82),
-            InvoiceItem::make('Service 13')->pricePerUnit(12.98),
-            InvoiceItem::make('Service 14')->pricePerUnit(160)->units('hours'),
-            InvoiceItem::make('Service 15')->pricePerUnit(62.21)->discountByPercent(5),
-            InvoiceItem::make('Service 16')->pricePerUnit(2.80),
-            InvoiceItem::make('Service 17')->pricePerUnit(56.21),
-            InvoiceItem::make('Service 18')->pricePerUnit(66.81)->discountByPercent(8),
-            InvoiceItem::make('Service 19')->pricePerUnit(76.37),
-            InvoiceItem::make('Service 20')->pricePerUnit(55.80),
-        ];
+
+        $statusTransaction = "";
+        if ($transaction->status == 'payment_pending') {
+            $statusTransaction = 'Pending Payment';
+        }
+
+        foreach($transaction->transactionDetails as $transactionDetail) {
+            $items[] = InvoiceItem::make($transactionDetail['product']['category']['name'])
+                ->pricePerUnit($transactionDetail->price);
+        }
         
         $notes = [
-            'your multiline',
-            'additional notes',
-            'in regards of delivery or something else',
+            'you need to make a payment using paypal before the due date',
+            'link for the paypal is paypal.me/eightyeightstudio',
+            'after the payment is made, u need to click on payment confirmation button in the website',
+            'do take a screenshot of the receipt for payment confirmation',
         ];
         $notes = implode("<br>", $notes);
         
@@ -124,23 +137,23 @@ class TransactionController extends Controller
             ->series('BIG')
             // ability to include translated invoice status
             // in case it was paid
-            ->status(__('invoices::invoice.paid'))
+            ->status($statusTransaction)
             ->sequence(667)
             ->serialNumberFormat('{SEQUENCE}/{SERIES}')
             ->seller($client)
             ->buyer($customer)
-            ->date(now()->subWeeks(3))
+            ->date(now())
             ->dateFormat('m/d/Y')
-            ->payUntilDays(14)
+            ->payUntilDays(1)
             ->currencySymbol('$')
             ->currencyCode('USD')
             ->currencyFormat('{SYMBOL}{VALUE}')
             ->currencyThousandsSeparator('.')
             ->currencyDecimalPoint(',')
-            ->filename($client->name . ' ' . $customer->name)
+            ->filename('Invoice-88studio' . '-' . $customer->name)
             ->addItems($items)
             ->notes($notes)
-            ->logo(public_path('vendor/invoices/sample-logo.png'))
+            ->logo(public_path('logo.png'))
             // You can additionally save generated invoice to configured disk
             ->save('public');
         
@@ -148,6 +161,6 @@ class TransactionController extends Controller
         // Then send email to party with link
         
         // And return invoice itself to browser or have a different view
-        return $invoice->stream();
+        return $invoice->download();
     }
 }

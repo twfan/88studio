@@ -43,10 +43,11 @@ class CartControllers extends Controller
      */
     public function store(Request $request)
     {
+
         $cart = Cart::where('user_id', $request->user['id'])->where('product_id', $request->product['id'])->first();
         
         if (!empty($cart)) {
-            $this->destroy($cart);
+            $this->destroy($cart->id);
         } else {
             $cart = new Cart;
             $cart->user_id = $request->user['id'];
@@ -54,6 +55,7 @@ class CartControllers extends Controller
             $cart->price = $request->product['price'];
             $cart->save();
         }
+        return Inertia::location(route('ych-comission'));
     }
 
     /**
@@ -83,8 +85,9 @@ class CartControllers extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Cart $cart)
+    public function destroy(String $id)
     {
+        $cart = Cart::find($id);
         $cart->delete();
     }
 
@@ -95,26 +98,28 @@ class CartControllers extends Controller
 
         try {
             DB::beginTransaction();
-
+            
             $transaction = new Transaction();
             $transaction->user_id = $user->id;
             $transaction->save();
             foreach($cart as $cartItem) {
-
+                
                 $transaction->sub_total += $cartItem->product->price;
                 $transaction->grand_total += $cartItem->product->price;
-
+                
                 $transactionDetail = new TransactionDetails();
                 $transactionDetail->transaction_id = $transaction->id;
                 $transactionDetail->product_id = $cartItem->product->id;
                 $transactionDetail->price = $cartItem->product->price;
                 $transactionDetail->save();
 
-                $this->destroy($cartItem);
+                $this->destroy($cartItem->id);
             }
             $transaction->save();
 
             DB::commit();
+
+            return Inertia::location(route('member.transactions'));
 
         } catch (Exception $e) {
 

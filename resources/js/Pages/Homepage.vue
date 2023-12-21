@@ -17,9 +17,11 @@ const carouselDiscount = ref(null)
 
 
 const prevDiscount = () => {
+    console.log("tes prev")
     carouselDiscount.value.prev()
 };
 const nextDiscount = () => {
+    console.log("tes next")
     carouselDiscount.value.next()
 };
 
