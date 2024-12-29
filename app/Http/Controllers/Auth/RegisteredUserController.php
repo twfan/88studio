@@ -47,6 +47,8 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
+        dd("coba");
+
         return redirect(RouteServiceProvider::MEMBERLOGIN);
     }
 }
